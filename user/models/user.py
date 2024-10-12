@@ -3,11 +3,12 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import Group
 
-from .managers import CustomUserManager
+from ..managers import CustomUserManager
 
 
 class CustomUser(AbstractUser):
-    """user model with email as username"""
+    """Custom user model with email as username"""
+    use_in_migrations = True
     username = None
     email = models.EmailField(_("email address"), unique=True)
     custom_groups = models.ManyToManyField(
@@ -22,6 +23,7 @@ class CustomUser(AbstractUser):
         ('admin', 'Admin'),
     )
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default=USER_TYPE_CHOICES[0][0])
+    user_cart = models.OneToOneField('Cart', on_delete=models.CASCADE, null=True, blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -45,4 +47,5 @@ class CustomUser(AbstractUser):
  
     class Meta:
         db_table = 'custom_user'
+        app_label = 'user'
 

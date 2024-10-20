@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <style>
+        
+    </style>
+</head>
+    <body>
+        <h1>Welcome to my mart!</h1>
+        <p>This is the home page.</p>
+        <ul>
+            <li><a href="{% url 'signup-user' %}">Signup</a></li>
+            <li><a href="{% url 'login-user' %}">Login</a></li>
+            <li><a href="{% url 'user-edit-and-retrieve' %}">user update and retrieve</a></li>
+            <li><a href="{% url 'list-users' %}">list all users</a></li>
+            <li><a href="{% url 'token_refresh' %}">Refresh token</a></li>
+        </ul>
+    </body>
+</html>

@@ -14,12 +14,13 @@ class Cart(models.Model):
  
     class Meta:
         db_table = 'cart'
-        app_label = 'user'
+        app_label = 'store'
         
 class CartItem(models.Model):
     """Cart item model"""
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    prod = models.CharField(max_length=100, default='product')
     quantity = models.PositiveIntegerField(default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
@@ -32,4 +33,4 @@ class CartItem(models.Model):
 
     class Meta:
         db_table = 'cart_item'
-        app_label = 'user'
+        app_label = 'store'

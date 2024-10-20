@@ -17,4 +17,4 @@ class Product(models.Model):
 
     class Meta:
         db_table = 'product'
-        app_label = 'user'
+        app_label = 'store'

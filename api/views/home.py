@@ -6,10 +6,10 @@ def ApiOverview(request):
     api_urls = {
         'app-name': 'MyStore API',
         'routes': {
-            'Overview-page': '/',
-            'User-related-urls': '/user/',
-            'product-related-urls': '/product/',
-            'order-related-urls': '/order/',
+            'Overview-page': '/api/',
+            'User-related-urls': '/api/user/',
+            'product-related-urls': '/api/product/',
+            'order-related-urls': '/api/order/',
         }
     }
  

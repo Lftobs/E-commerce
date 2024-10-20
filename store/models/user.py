@@ -47,5 +47,5 @@ class CustomUser(AbstractUser):
  
     class Meta:
         db_table = 'custom_user'
-        app_label = 'user'
+        app_label = 'store'
 

@@ -28,6 +28,9 @@ class IsSeller(permissions.BasePermission):
     def has_object_permission(self, request, view, obj) -> bool:
         return request.user.is_buyer()
 class ProductCreateView(ListCreateAPIView):
+    """
+    ProductCreateView handles the creation and listing of products.
+    """
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     parser_classes = [JSONParser, MultiPartParser, FormParser]
@@ -40,6 +43,15 @@ class ProductCreateView(ListCreateAPIView):
         return [permission() for permission in permission_class]
 
 class ProductUpdateDeleteView(GenericAPIView):
+    """
+    ProductUpdateDeleteView handles the retrieval, update, and deletion of a product instance.
+    Methods:
+        get_queryset(pk): Retrieves a product instance by its primary key.
+        get(request, pk): Retrieves and returns a product instance.
+        patch(request, pk): Updates a product instance partially.
+        delete(request, pk): Deletes a product instance.
+    """
+    
     serializer_class = ProductSerializer
     
     def get_queryset(self, pk):
@@ -69,7 +81,6 @@ class ProductUpdateDeleteView(GenericAPIView):
             return Response({
                 "details": "You do not  have permission to update this product"
             }, status=status.HTTP_401_UNAUTHORIZED)
-        # request.data['seller'] = request.user.id
         serializer = self.serializer_class(product, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

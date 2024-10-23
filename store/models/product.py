@@ -8,7 +8,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to=upload_to, null=True, blank=True)
+    image = models.ImageField(upload_to=upload_to, blank=True)
     stock = models.PositiveIntegerField() # number of items available
     seller = models.ForeignKey(CustomUser, related_name='prod', on_delete=models.CASCADE)
 

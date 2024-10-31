@@ -6,8 +6,11 @@ from .product import Product
 class Cart(models.Model):
     """Cart model"""
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    # items = models.ManyToManyField('CartItem', related_name='cart_items', blank=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    items = models.ManyToManyField('CartItem', related_name='carts', blank=True)  # Changed related_name here
+    
+    @property
+    def total_price(self):
+        return sum(item.total_price for item in self.items.all())
 
     def __str__(self):
         return f"Cart for {self.user.email}"
@@ -18,9 +21,8 @@ class Cart(models.Model):
         
 class CartItem(models.Model):
     """Cart item model"""
-    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    cart = models.ForeignKey('Cart', related_name='cart_items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    prod = models.CharField(max_length=100, default='product')
     quantity = models.PositiveIntegerField(default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     

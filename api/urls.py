@@ -2,6 +2,11 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import home, user, product
+from .views.cart import CartItemViewSet
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'cartitems', CartItemViewSet, basename='cartitems')
 
 urlpatterns = [
     path('', home.ApiOverview, name='home'),
@@ -16,3 +21,5 @@ urlpatterns = [
     path('product/', product.ProductCreateView.as_view(), name="create-and-list-product"),
     path('product/<int:pk>', product.ProductUpdateDeleteView.as_view(), name="update-delete-product")
 ]
+
+urlpatterns += router.urls

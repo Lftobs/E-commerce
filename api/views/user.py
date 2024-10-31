@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from api.serializers.cart import CartSerializer
 from store.models.user import CustomUser
 from ..serializers.user import UserListSerializer, UserLoginSerializer, UserSerializer
 from rest_framework.views import APIView
@@ -41,7 +42,7 @@ class UserView(APIView):
         serializer = self.serializer_class(user, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-class SignUp(APIView):
+class SignUp(GenericAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
@@ -52,7 +53,11 @@ class SignUp(APIView):
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             user = serializer.save()
+            cart = CartSerializer(data={'user': user.id})
+            if cart.is_valid():
+                cart.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_201_CREATED)
             
     
 class UserLoginAPIView(GenericAPIView):

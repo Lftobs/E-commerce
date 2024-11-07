@@ -9,8 +9,13 @@ class Cart(models.Model):
     items = models.ManyToManyField('CartItem', related_name='carts', blank=True)  # Changed related_name here
     
     @property
+    def get_items(self):
+        return CartItem.objects.filter(cart=self).all()
+    
+    @property
     def total_price(self):
-        return sum(item.total_price for item in self.items.all())
+        items = CartItem.objects.filter(cart=self).all()
+        return sum(item.total_price for item in items)
 
     def __str__(self):
         return f"Cart for {self.user.email}"

@@ -6,7 +6,7 @@ from .views.cart import CartItemViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'cartitems', CartItemViewSet, basename='cartitems')
+router.register(r'cart', CartItemViewSet, basename='cartitems')
 
 urlpatterns = [
     path('', home.ApiOverview, name='home'),

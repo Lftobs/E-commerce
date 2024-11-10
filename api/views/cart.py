@@ -14,7 +14,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         cart = Cart.objects.get(user=self.request.user)
-        return self.queryset.filter(cart=cart)
+        return cart.cart_items.all()
     
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -34,7 +34,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(detail=False, methods=['get'], url_path='info')
+    @action(detail=False, methods=['get'], url_path='info', url_name='cart-info')
     def cart_info(self, request):
         """ func for cart info endpoint"""
         cart = Cart.objects.get(user=request.user)
@@ -43,12 +43,12 @@ class CartItemViewSet(viewsets.ModelViewSet):
             {
                 
                 'cart_info': serializer.data,
-                'cart_items': self.serializer_class(cart.get_items, many=True).data,
+                'cart_items':  self.serializer_class(cart.cart_items, many=True).data,
                 'total_cart_items_price': cart.total_price 
                 
             }, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=['get'], url_path='clear-cart/')
+    @action(detail=False, methods=['get'], url_path='clear-cart', url_name='clear-cart')
     def clear_cart(self, request):
         cart = Cart.objects.get(user=request.user)
         CartItem.objects.filter(cart=cart).delete()

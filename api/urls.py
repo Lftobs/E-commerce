@@ -1,12 +1,14 @@
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from .views.orders import OrderViewset
 from .views import home, user, product
 from .views.cart import CartItemViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'cart', CartItemViewSet, basename='cartitems')
+router.register(r'order', OrderViewset, basename='order')
 
 urlpatterns = [
     path('', home.ApiOverview, name='home'),

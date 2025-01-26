@@ -5,13 +5,15 @@ from api.serializers.cart import CartSerializer
 from store.models.user import CustomUser
 from ..serializers.user import UserListSerializer, UserLoginSerializer, UserSerializer
 from rest_framework.views import APIView
-from rest_framework.generics import  CreateAPIView, GenericAPIView 
+from rest_framework.generics import  GenericAPIView 
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
+from ..utils.helpers import res_gen
+
  
 @api_view(['GET'])
 def get_all_users(request):
@@ -56,7 +58,8 @@ class SignUp(GenericAPIView):
             cart = CartSerializer(data={'user': user.id})
             if cart.is_valid():
                 cart.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            res = res_gen(serializer.data, status.HTTP_201_CREATED, 'User created successfully')
+            return Response(res, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_201_CREATED)
             
     
@@ -75,5 +78,6 @@ class UserLoginAPIView(GenericAPIView):
         token = RefreshToken.for_user(user)
         data = serializer.data
         data["tokens"] = {"refresh": str(token), "access": str(token.access_token)}
-        return Response(data, status=status.HTTP_200_OK)
+        res = res_gen(data, status.HTTP_200_OK, 'User logged in successfully')
+        return Response(res, status=status.HTTP_200_OK)
     

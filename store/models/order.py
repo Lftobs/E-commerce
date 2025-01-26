@@ -22,10 +22,25 @@ class Order(models.Model):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled')
     )
+    
+    Payment_method_choices = [
+        ('pod', 'Payment on Delivery'),
+        ('stripe', 'Stripe'),
+    ]
+    
+    payment_status = [
+        ('pending', 'Pending'),
+        ('success', 'Success'),
+        ('failed', 'Failed'),
+    ]
         
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     id = models.AutoField(primary_key=True)
     tracking_id = models.CharField(unique=True, max_length=15, editable=False)
+    shipping_address = models.TextField(null=True, blank=True)
+    payment_method = models.CharField(max_length=100, choices=Payment_method_choices, default=Payment_method_choices[1][0])
+    payment_status = models.CharField(max_length=100, choices=payment_status, default=payment_status[0][0])
+    stripe_payment_intent_id = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=60, choices=Order_Status, default=Order_Status[0][0])
     total_price = models.DecimalField(max_digits=100000000, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)

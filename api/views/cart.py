@@ -2,6 +2,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
 from api.serializers.cart import CartItemSerializer, CartSerializer
+from api.utils.helpers import res_gen
 from store.models.cart import Cart, CartItem
 from rest_framework.decorators import action
 
@@ -11,6 +12,14 @@ class CartItemViewSet(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
     model = CartItem
     permission_classes = [permissions.IsAuthenticated]
+    
+    # def get_serializer_class(self):
+    #     if self.action == 'create':
+    #         class CreateCartItemSerializer(CartItemSerializer):
+    #             class Meta(CartItemSerializer.Meta):
+    #                 exclude = ['total_price']
+    #         return CreateCartItemSerializer
+    #     return CartItemSerializer
 
     def get_queryset(self):
         cart = Cart.objects.get(user=self.request.user)
@@ -29,9 +38,12 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 existing_product.quantity += serializer.validated_data.get('quantity')
                 existing_product.save()
                 new_serializer = self.serializer_class(existing_product, many=False)
-                return Response({'detail': 'Item already in cart so quantity was updated instead', 'data': new_serializer.data}, status=status.HTTP_200_OK)
+                res = res_gen(new_serializer.data, status.HTTP_200_OK, 'Item already in cart so quantity was updated instead')
+                return Response(res, status=status.HTTP_200_OK)
             serializer.save(cart=cart)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            res = res_gen(serializer.data, status.HTTP_200_OK, 'Item added to cart.')
+            print(res)
+            return Response(res, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['get'], url_path='info', url_name='cart-info')
@@ -41,10 +53,13 @@ class CartItemViewSet(viewsets.ModelViewSet):
         serializer = CartSerializer(cart, many=False)
         return Response(
             {
-                
-                'cart_info': serializer.data,
-                'cart_items':  self.serializer_class(cart.cart_items, many=True).data,
-                'total_cart_items_price': cart.total_price 
+                'message': 'Cart info retrieved',
+                'status': status.HTTP_200_OK,
+                'data' : {
+                    'cart_info': serializer.data,
+                    'cart_items':  self.serializer_class(cart.cart_items, many=True).data,
+                    'total_cart_items_price': cart.total_price
+                }
                 
             }, status=status.HTTP_200_OK)
     

@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from api.serializers.product import ProductSerializer
+from api.utils.helpers import res_gen
 from store.models.product import Product
 from store.models.user import CustomUser
 from ..serializers.user import UserListSerializer, UserLoginSerializer, UserSerializer
@@ -23,10 +24,10 @@ class IsSeller(permissions.BasePermission):
     """
     def  has_permission(self, request, view) -> bool:
          
-        return request.user.is_buyer()
+        return request.user.is_seller()
 
     def has_object_permission(self, request, view, obj) -> bool:
-        return request.user.is_buyer()
+        return request.user.is_seller()
 class ProductCreateView(ListCreateAPIView):
     """
     ProductCreateView handles the creation and listing of products.
@@ -41,6 +42,15 @@ class ProductCreateView(ListCreateAPIView):
         else:
             permission_class=[IsAuthenticated, IsSeller]
         return [permission() for permission in permission_class]
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save(seller=request.user)
+            res = res_gen(serializer.data, status.HTTP_201_CREATED, "Product created successfully")
+            return Response(res, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class ProductUpdateDeleteView(GenericAPIView):
     """
@@ -54,6 +64,7 @@ class ProductUpdateDeleteView(GenericAPIView):
     
     serializer_class = ProductSerializer
     
+   
     def get_queryset(self, pk):
         try:
             return Product.objects.get(pk=pk)
@@ -64,27 +75,32 @@ class ProductUpdateDeleteView(GenericAPIView):
         product = self.get_queryset(pk)
         if product is None:
             return Response({
-                "details": "Product with this id not found"
+                "message": "Product with this id not found",
+                "status": status.HTTP_404_NOT_FOUND
             }, status=status.HTTP_404_NOT_FOUND)
         serializer = self.serializer_class(product, many=False)
-        return Response(serializer.data, status=status.HTTP_401_UNAUTHORIZED)
+        res = res_gen(serializer.data, status.HTTP_200_OK, "Product retrieved successfully")
+        return Response(res, status=status.HTTP_200_OK)
     
     def patch(self, request, pk):
         product = self.get_queryset(pk)
         
         if product is None:
             return Response({
-                "details": "Product with this id not found"
+                "message": "Product with this id not found",
+                "status": status.HTTP_404_NOT_FOUND
             }, status=status.HTTP_404_NOT_FOUND)
         
         if product.seller != request.user:
             return Response({
-                "details": "You do not  have permission to update this product"
+                "message": "You do not have permission to update this product",
+                "status": status.HTTP_401_UNAUTHORIZED
             }, status=status.HTTP_401_UNAUTHORIZED)
         serializer = self.serializer_class(product, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            res = res_gen(serializer.data, status.HTTP_200_OK, "Product updated successfully")
+            return Response(res, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)      
     
     def delete(self, request, pk):
@@ -92,16 +108,19 @@ class ProductUpdateDeleteView(GenericAPIView):
 
         if product is None:
             return Response({
-                "details": "Product with this id not found"
+                "message": "Product with this id not found",
+                "status": status.HTTP_404_NOT_FOUND
             }, status=status.HTTP_404_NOT_FOUND)
 
         if product.seller != request.user:
             return Response({
-                "details": "You do not have permission to delete this product"
+                "message": "You do not have permission to delete this product",
+                "status": status.HTTP_401_UNAUTHORIZED
             }, status=status.HTTP_401_UNAUTHORIZED)
 
         product.delete()
         return Response({
-            "details": "Product deleted successfully"
+            "message": "Product deleted successfully",
+            "status": status.HTTP_204_NO_CONTENT
         }, status=status.HTTP_204_NO_CONTENT)
     

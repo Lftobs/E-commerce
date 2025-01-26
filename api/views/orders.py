@@ -3,6 +3,7 @@ from rest_framework import status, viewsets, permissions
 from rest_framework.response import Response
 
 from api.serializers.order import OrderSerializer, OrderItemSerializer
+from api.utils.helpers import res_gen
 from store.models.cart import Cart
 from store.models.order import Order
 
@@ -47,4 +48,5 @@ class OrderViewset(viewsets.ModelViewSet):
         order.total_price = order.total_items_price
         order.save()
         cart.cart_items.all().delete()
-        return Response(self.serializer_class(order, many=False).data, status=status.HTTP_201_CREATED)
+        res = res_gen(self.serializer_class(order, many=False).data, status.HTTP_201_CREATED, "Order for user cart items create.")
+        return Response(res, status=status.HTTP_201_CREATED)

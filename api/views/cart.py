@@ -42,7 +42,6 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 return Response(res, status=status.HTTP_200_OK)
             serializer.save(cart=cart)
             res = res_gen(serializer.data, status.HTTP_200_OK, 'Item added to cart.')
-            print(res)
             return Response(res, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

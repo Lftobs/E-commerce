@@ -1,0 +1,29 @@
+[project]
+name = "e-com-django"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "asgiref==3.8.1",
+    "attrs==25.3.0",
+    "django==5.1.2",
+    "django-filter==24.3",
+    "djangorestframework==3.15.2",
+    "djangorestframework-simplejwt==5.3.1",
+    "drf-spectacular==0.28.0",
+    "inflection==0.5.1",
+    "jsonschema==4.25.0",
+    "jsonschema-specifications==2025.4.1",
+    "markdown==3.7",
+    "pillow==10.4.0",
+    "pyjwt==2.9.0",
+    "pyyaml==6.0.2",
+    "referencing==0.36.2",
+    "requests>=2.32.4",
+    "rpds-py==0.26.0",
+    "sqlparse==0.5.1",
+    "typing-extensions==4.14.1",
+    "uritemplate==4.2.0",
+    "uuid7>=0.1.0",
+]

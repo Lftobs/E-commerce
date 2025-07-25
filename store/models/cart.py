@@ -1,11 +1,13 @@
 from django.db import models
+from uuid_extensions import uuid7
 from .user import CustomUser 
 from .product import Product
 
 
 class Cart(models.Model):
     """Cart model"""
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid7(), editable=False)
+    profile = models.OneToOneField('UserProfile', on_delete=models.CASCADE, null=True, blank=True)
     items = models.ManyToManyField('CartItem', related_name='carts', blank=True)  # Changed related_name here
     
     @property
@@ -18,7 +20,7 @@ class Cart(models.Model):
         return sum(item.total_price for item in items)
 
     def __str__(self):
-        return f"Cart for {self.user.email}"
+        return f"Cart for {self.profile}"
  
     class Meta:
         db_table = 'cart'
@@ -26,6 +28,7 @@ class Cart(models.Model):
         
 class CartItem(models.Model):
     """Cart item model"""
+    id = models.UUIDField(primary_key=True, default=uuid7(), editable=False)
     cart = models.ForeignKey('Cart', related_name='cart_items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
@@ -36,7 +39,7 @@ class CartItem(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Cart item for {self.cart.user.email}"
+        return f"Cart item for {self.cart.profile}"
 
     class Meta:
         db_table = 'cart_item'

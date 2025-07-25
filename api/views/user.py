@@ -1,9 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, serializers
+from django.db import transaction
 from api.serializers.cart import CartSerializer
+from store.models.cart import Cart
 from store.models.user import CustomUser
-from ..serializers.user import UserListSerializer, UserLoginSerializer, UserSerializer
+from ..serializers.user import SellerProfileSerializer, UserListSerializer, UserLoginSerializer, UserProfileSerializer, UserSerializer
 from rest_framework.views import APIView
 from rest_framework.generics import  GenericAPIView 
 from rest_framework.response import Response
@@ -53,14 +55,34 @@ class SignUp(GenericAPIView):
         data = request.data.copy()
         data.update({'password': make_password(data.get('password'))})
         serializer = self.serializer_class(data=data)
+        
         if serializer.is_valid():
-            user = serializer.save()
-            cart = CartSerializer(data={'user': user.id})
-            if cart.is_valid():
-                cart.save()
-            res = res_gen(serializer.data, status.HTTP_201_CREATED, 'User created successfully')
-            return Response(res, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_201_CREATED)
+            
+            with transaction.atomic():
+                user = serializer.save()
+
+                if user.is_seller():
+                    print('creating seller profile')
+                    profile_serializer = SellerProfileSerializer(data={'user': user.id, "is_seller": True})
+                    profile_serializer.is_valid(raise_exception=True)
+                    profile = profile_serializer.save()
+                else:
+                    print('creating buyer profile')
+                    profile_serializer = UserProfileSerializer(data={'user': user.id, "is_seller": False})
+                    profile_serializer.is_valid(raise_exception=True)
+                    profile = profile_serializer.save()
+
+                cart = Cart.objects.create(profile=profile)
+                profile.user_cart = cart
+                profile.save()
+
+                if user.is_seller():
+                    res = res_gen(serializer.data, status.HTTP_201_CREATED, 'Seller account created successfully')
+                    return Response(res, status=status.HTTP_201_CREATED)
+
+                res = res_gen(serializer.data, status.HTTP_201_CREATED, 'User created successfully')
+                return Response(res, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
     
 class UserLoginAPIView(GenericAPIView):
@@ -72,12 +94,13 @@ class UserLoginAPIView(GenericAPIView):
     serializer_class = UserLoginSerializer
 
     def post(self, request, *args, **kwargs):
+        
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
         token = RefreshToken.for_user(user)
+
         data = serializer.data
         data["tokens"] = {"refresh": str(token), "access": str(token.access_token)}
         res = res_gen(data, status.HTTP_200_OK, 'User logged in successfully')
         return Response(res, status=status.HTTP_200_OK)
-    

@@ -1,6 +1,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
+from ..serializers.base import ApiOverviewSerializer
  
+@extend_schema(responses=ApiOverviewSerializer)
 @api_view(['GET'])
 def ApiOverview(request):
     api_urls = {

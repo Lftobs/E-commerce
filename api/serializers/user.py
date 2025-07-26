@@ -6,9 +6,9 @@ class UserSerializer(serializers.ModelSerializer):
     """ Serializer class to create users """
     class Meta:
         model = CustomUser
-        fields = ('id', 'email', 'user_type', 'password')
-        extra_kwargs = {'password': {'write_only': True}}
-        
+        fields = ('email', 'user_type', 'password')
+        extra_kwargs = {'password': {'write_only': True}, 'id': {'read_only': True}}
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """ Serializer class to create user profile """
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())

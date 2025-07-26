@@ -15,8 +15,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from ..utils.helpers import res_gen
+from drf_spectacular.utils import extend_schema
 
  
+@extend_schema(responses=UserSerializer(many=True))
 @api_view(['GET'])
 def get_all_users(request):
     if request.query_params:

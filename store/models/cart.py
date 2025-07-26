@@ -6,7 +6,7 @@ from .product import Product
 
 class Cart(models.Model):
     """Cart model"""
-    id = models.UUIDField(primary_key=True, default=uuid7(), editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid7, editable=False)
     profile = models.OneToOneField('UserProfile', on_delete=models.CASCADE, null=True, blank=True)
     items = models.ManyToManyField('CartItem', related_name='carts', blank=True)  # Changed related_name here
     
@@ -28,7 +28,7 @@ class Cart(models.Model):
         
 class CartItem(models.Model):
     """Cart item model"""
-    id = models.UUIDField(primary_key=True, default=uuid7(), editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid7, editable=False)
     cart = models.ForeignKey('Cart', related_name='cart_items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)

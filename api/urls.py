@@ -13,15 +13,20 @@ router.register(r'order', OrderViewset, basename='order')
 urlpatterns = [
     path('', home.ApiOverview, name='home'),
     # auth/users
-    path('users/all/', user.get_all_users, name='list-users'),
-    path('user/', user.UserView.as_view(), name='user-edit-and-retrieve'),
-    path('signup/', user.SignUp.as_view(), name='signup-user'),
-    path("login/", user.UserLoginAPIView.as_view(), name="login-user"),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/users/all/', user.get_all_users, name='list-users'),
+    path('auth/user/', user.UserView.as_view(), name='user-edit-and-retrieve'),
+    path('auth/signup/', user.SignUp.as_view(), name='signup-user'),
+    path("auth/login/", user.UserLoginAPIView.as_view(), name="login-user"),
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    
     # products
-    path('product/', product.ProductCreateView.as_view(), name="create-and-list-product"),
-    path('product/<int:pk>', product.ProductUpdateDeleteView.as_view(), name="update-delete-product")
+    path('product/', product.ProductListView.as_view(), name='list-products'),
+    path('product/<str:pk>/', product.ProductDetailView.as_view(), name='product-detail'),
+
+    # product inventory
+    path('inventory/', product.ProductInventoryCreateView.as_view(), name="create-and-list-product"),
+    path('inventory/<str:pk>', product.ProductInventoryUpdateDeleteView.as_view(), name="update-delete-product")
 ]
 
 urlpatterns += router.urls

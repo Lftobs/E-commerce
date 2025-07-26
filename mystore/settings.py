@@ -157,8 +157,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Me-Mart API',
-    'DESCRIPTION': 'API documentation for Me-Mart',
+    'DESCRIPTION': 'API documentation for Me-Mart. Find more documentation here: [auth](/api-auth/)',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    "EXTERNAL_DOCS": {
+        "description": "Postman Collection",
+        "url": "https://www.postman.com/random-url"
+    },
     # OTHER SETTINGS
 }

@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
     """Custom user model with email as username"""
     use_in_migrations = True
     username = None
-    id = UUIDField(primary_key=True, default=uuid7(), editable=False)
+    id = UUIDField(primary_key=True, default=uuid7, editable=False)
     email = models.EmailField(_("email address"), unique=True)
     custom_groups = models.ManyToManyField(
         Group,
@@ -55,7 +55,7 @@ class CustomUser(AbstractUser):
 
 class UserProfile(models.Model):
     """User profile model"""
-    id = UUIDField(primary_key=True, default=uuid7(), editable=False)
+    id = UUIDField(primary_key=True, default=uuid7, editable=False)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
@@ -86,7 +86,7 @@ class SellerProfile(UserProfile):
         
 class BusinessProfile(models.Model):
     """Business profile model for sellers"""
-    id = UUIDField(primary_key=True, default=uuid7(), editable=False)
+    id = UUIDField(primary_key=True, default=uuid7, editable=False)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=100, blank=True, null=True)
     business_address = models.TextField(blank=True, null=True)

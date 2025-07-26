@@ -22,14 +22,14 @@ class CartItemViewSet(viewsets.ModelViewSet):
     #     return CartItemSerializer
 
     def get_queryset(self):
-        cart = Cart.objects.get(user=self.request.user)
+        cart = Cart.objects.get(profile__user=self.request.user)
         return cart.cart_items.all()
     
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         
         if serializer.is_valid():
-            cart = Cart.objects.get(user=request.user)
+            cart = Cart.objects.get(profile__user=request.user)
             if cart is None:
                 return Response({'detail': 'Cart not found for user'}, status=status.HTTP_404_NOT_FOUND)
             product = serializer.validated_data.get('product')
@@ -48,7 +48,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='info', url_name='cart-info')
     def cart_info(self, request):
         """ func for cart info endpoint"""
-        cart = Cart.objects.get(user=request.user)
+        cart = Cart.objects.get(profile__user=request.user)
         serializer = CartSerializer(cart, many=False)
         return Response(
             {
@@ -64,6 +64,6 @@ class CartItemViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'], url_path='clear-cart', url_name='clear-cart')
     def clear_cart(self, request):
-        cart = Cart.objects.get(user=request.user)
+        cart = Cart.objects.get(profile__user=request.user)
         CartItem.objects.filter(cart=cart).delete()
         return Response({'detail': 'Cart cleared successfully'}, status=status.HTTP_204_NO_CONTENT)

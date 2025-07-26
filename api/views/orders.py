@@ -20,11 +20,10 @@ class OrderViewset(viewsets.ModelViewSet):
             raise Http404("No order found for the user.")
     
     def create(self, request, *args, **kwargs):
-        cart = Cart.objects.get(user=request.user)
+        cart = Cart.objects.get(profile__user=request.user)
         if cart.cart_items.first() is None:
             return Response({'details': 'Order creation failed because cart is empty!'}, status=status.HTTP_400_BAD_REQUEST)
         order = self.model.objects.create(user=request.user)
-        order_items = []
         for item in cart.cart_items.all():
             if item.product.stock < item.quantity:
                 return Response(

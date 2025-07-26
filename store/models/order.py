@@ -37,7 +37,7 @@ class Order(models.Model):
     ]
         
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    id = models.UUIDField(primary_key=True, default=uuid7(), editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid7, editable=False)
     tracking_id = models.CharField(unique=True, max_length=15, editable=False)
     shipping_address = models.TextField(null=True, blank=True)
     payment_method = models.CharField(max_length=100, choices=Payment_method_choices, default=Payment_method_choices[1][0])
@@ -70,7 +70,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     """Order item model"""
-    id = models.UUIDField(primary_key=True, default=uuid7(), editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid7, editable=False)
     order = models.ForeignKey('Order', related_name='order_items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
